@@ -1,14 +1,22 @@
 const { expect } = require("chai");
 const { ethers } = require("hardhat");
 
+const tokens = (n) => {
+  return ethers.utils.parseUnits(n.toString(), "ether");
+};
+
+const ether = tokens;
+
 describe("RealEstate", () => {
   let realEstate, escrow;
-  let deployer, seller, buyer;
+  let deployer, seller;
   let nftID = 1;
   beforeEach(async () => {
     accounts = await ethers.getSigners();
     deployer = accounts[0];
     buyer = accounts[1];
+    inspector = accounts[2];
+    lender = accounts[3];
     seller = deployer;
 
     const RealEstate = await ethers.getContractFactory("RealEstate");
@@ -18,8 +26,12 @@ describe("RealEstate", () => {
     escrow = await Escrow.deploy(
       realEstate.address,
       nftID,
+      ether(100),
+      ether(20),
       seller.address,
-      buyer.address
+      buyer.address,
+      inspector.address,
+      lender.address
     );
     transaction = await realEstate
       .connect(seller)
